@@ -18,9 +18,12 @@ public class Player : BasePlayer {
 			mousePosition = Input.mousePosition;
 			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
 			mousePosition.z = transform.position.z;
+			offset = mousePosition - transform.position;
 
-			transform.position = Vector3.MoveTowards (transform.position, mousePosition, speedMod/ width * Time.deltaTime);
+			//transform.position = Vector3.MoveTowards (transform.position, mousePosition, speedMod/ width * Time.deltaTime);
+			gameObject.GetComponent<Rigidbody2D>().AddForce(offset);
 			Camera.main.orthographicSize = camSize + width * 2;
+			Camera.main.transform.position = new Vector3(transform.position.x,transform.position.y,-1f);
 			//transform.position = Vector2.Lerp (transform.position, mousePosition, speedMod);
 			//float transX = Input.GetAxis ("Horizontal") * speedMod * Time.deltaTime;
 			//float transY = Input.GetAxis ("Vertical") * speedMod * Time.deltaTime;
@@ -28,6 +31,7 @@ public class Player : BasePlayer {
 			//transform.rotation = new Quaternion();
 			//transform.Translate (new Vector3 (transX, transY));
 		}
-	
+
+		Move ();
 	}
 }

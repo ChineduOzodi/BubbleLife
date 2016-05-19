@@ -19,10 +19,10 @@ public class GameManager : MonoBehaviour
 	public bool setup = false;
 
 	public GameObject border;
+	public GameObject food;
 	public GameObject bubble;
 	public GameObject infoCanvas;
 
-	private Camera mainCam = Camera.main;
 	private GameObject player;
 
 	GameObject borderEmpty;
@@ -101,6 +101,7 @@ public class GameManager : MonoBehaviour
 				} else {
 					spawnLocations.Add (new Coord (x, y));
 				}
+				//spawnLocations.Add (new Coord (x, y));
 			}
 					
 		}
@@ -117,6 +118,7 @@ public class GameManager : MonoBehaviour
 		player.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 		player.transform.localScale = new Vector3(1.8f,1.8f);
 		player.AddComponent<Player>();
+		//player.AddComponent<Rigidbody2D> ();
 		player.name = "player1";
 		player.tag = "Player";
 
@@ -139,14 +141,16 @@ public class GameManager : MonoBehaviour
 		ai.transform.localScale = new Vector3(1.8f,1.8f);
 		ai.name = "AI";
 		ai.tag = "ai";
+		//ai.AddComponent<Rigidbody2D> ();
 		AI aiSCript = ai.AddComponent<AI>();
+
 		//ai.transform.SetParent (foodEmpty.transform);
 	}
 	private void AddFood (){
 		int index = UnityEngine.Random.Range (0, spawnLocations.Count);
 		Coord location = spawnLocations [index];
 		spawnLocations.RemoveAt (index);
-		GameObject bubbleFood = Instantiate (bubble, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
+		GameObject bubbleFood = Instantiate (food, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
 		bubbleFood.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 		bubbleFood.transform.localScale = new Vector3(.56f,.56f);
 		Food bubbleFoodFood = bubbleFood.AddComponent<Food>();
@@ -162,6 +166,6 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		mainCam.transform.position = new Vector3(player.transform.position.x,player.transform.position.y,-1f);
+		
 	}
 }

@@ -8,9 +8,11 @@ public class BasePlayer : MonoBehaviour {
 	public float width = 1.8f;
 	protected GameManager gameManager;
 	protected float speedMod = 40;
+	protected float maxSpeed = 10;
 	protected Text info;
 	protected float diffScale = .1f;
-
+	protected Rigidbody2D rigid;
+	protected Vector3 offset;
 	protected void Eat(){
 		
 	}
@@ -23,11 +25,22 @@ public class BasePlayer : MonoBehaviour {
 	void Awake(){
 		gameManager = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameManager> ();
 		info = transform.GetComponentInChildren<Text> ();
+		rigid = gameObject.GetComponent<Rigidbody2D> ();
 	}
-	void update(){
+	protected void Move(){
+		maxSpeed = speedMod / width;
+		float scale = (maxSpeed * maxSpeed - rigid.velocity.sqrMagnitude);
+		offset.Normalize ();
+		offset.Scale (new Vector3 (scale, scale));
+		rigid.AddForce(offset);
+
+//		if (rigid.velocity.sqrMagnitude > maxSpeed * maxSpeed){
+//			rigid.velocity.Normalize();
+//			rigid.velocity.Scale (new Vector2 (maxSpeed, maxSpeed));
+//		}
 	}
 
-	void OnCollisionEnter2D( Collision2D col){
+	void OnTriggerEnter2D( Collider2D col){
 
 		if (col.gameObject.tag == "food") {
 			Food colFood = col.gameObject.GetComponent<Food> ();
