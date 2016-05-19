@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class BasePlayer : MonoBehaviour {
 
-	int food = 10;
+	public int food = 10;
 	public float width = 1.8f;
 	protected GameManager gameManager;
 	protected float speedMod = 40;
+	protected Text info;
+	protected float diffScale = .1f;
 
 	protected void Eat(){
 		
@@ -19,6 +22,7 @@ public class BasePlayer : MonoBehaviour {
 
 	void Awake(){
 		gameManager = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameManager> ();
+		info = transform.GetComponentInChildren<Text> ();
 	}
 	void update(){
 	}
@@ -30,8 +34,17 @@ public class BasePlayer : MonoBehaviour {
 			food += colFood.amount;
 			gameManager.SendMessage ("AddFood", colFood.coord);
 			Destroy (col.gameObject);
-
+			info.text = food.ToString ();
 			UpdateSize ();
+		} else if (col.gameObject.tag != "border") {
+			BasePlayer colScript = col.gameObject.GetComponent<BasePlayer> ();
+			if (colScript.width < width * (1f - diffScale) && col.gameObject.tag != "Player") {
+				food += colScript.food;
+				gameManager.AddAI ();
+				Destroy (col.gameObject);
+				info.text = food.ToString ();
+				UpdateSize ();
+			}
 		}
 
 		

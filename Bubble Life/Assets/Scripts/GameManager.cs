@@ -10,8 +10,9 @@ using System.IO;
 public class GameManager : MonoBehaviour
 {
 
-	public int borderSize = 100;
+	public int borderSize = 200;
 	public int foodLimit = 500;
+	public int aiCount = 20;
 
 	public static GameManager instance = null;
 	string savePath;
@@ -19,8 +20,9 @@ public class GameManager : MonoBehaviour
 
 	public GameObject border;
 	public GameObject bubble;
+	public GameObject infoCanvas;
 
-	private Camera mainCam;
+	private Camera mainCam = Camera.main;
 	private GameObject player;
 
 	GameObject borderEmpty;
@@ -43,7 +45,6 @@ public class GameManager : MonoBehaviour
 
 		spawnLocations = new List<Coord> ();
 
-		mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 		setup = false;
 
 		borderEmpty = new GameObject ("border");
@@ -89,7 +90,7 @@ public class GameManager : MonoBehaviour
 //		}
 	}
 
-	void RunSetup(){
+	private void RunSetup(){
 		setup = true;
 
 		for (int x = 0; x <= borderSize; x++) {
@@ -103,26 +104,43 @@ public class GameManager : MonoBehaviour
 			}
 					
 		}
+
+		//spawn Food
+		for (int i = 0; i < foodLimit; i++) {
+			AddFood ();
+		}
+
 		//Add Player
 		int index = UnityEngine.Random.Range (0, spawnLocations.Count);
 		Coord location = spawnLocations [index];
-		spawnLocations.RemoveAt (index);
 		player = Instantiate (bubble, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
 		player.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 		player.transform.localScale = new Vector3(1.8f,1.8f);
 		player.AddComponent<Player>();
 		player.name = "player1";
 		player.tag = "Player";
-		GameObject playerInfo = Instantiate(info,new Vector3(),
 
-		for (int i = 0; i < foodLimit; i++) {
-			AddFood ();
+		//Spawn AI
+		for (int i = 0; i < aiCount; i++) {
+			AddAI ();
 		}
+
 
 		setup = false;
 
 
 
+	}
+	public void AddAI (){
+		int index = UnityEngine.Random.Range (0, spawnLocations.Count);
+		Coord location = spawnLocations [index];
+		GameObject ai = Instantiate (bubble, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
+		ai.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+		ai.transform.localScale = new Vector3(1.8f,1.8f);
+		ai.name = "AI";
+		ai.tag = "ai";
+		AI aiSCript = ai.AddComponent<AI>();
+		//ai.transform.SetParent (foodEmpty.transform);
 	}
 	private void AddFood (){
 		int index = UnityEngine.Random.Range (0, spawnLocations.Count);
