@@ -28,11 +28,21 @@ public class BasePlayer : MonoBehaviour {
 		rigid = gameObject.GetComponent<Rigidbody2D> ();
 	}
 	protected void Move(){
-		maxSpeed = speedMod / width;
-		float scale = (maxSpeed * maxSpeed - rigid.velocity.sqrMagnitude);
-		offset.Normalize ();
-		offset.Scale (new Vector3 (scale, scale));
-		rigid.AddForce(offset);
+		if (transform.position.x < 0) {
+			offset = new Vector3 (10, 9);
+		} else if (transform.position.y < 0) {
+			offset = new Vector3 (0, 10);
+		} else if (transform.position.x > gameManager.borderSize) {
+			offset = new Vector3 (-10, 9);
+		} else if (transform.position.y > gameManager.borderSize) {
+			offset = new Vector3 (0, -10);
+		} else {
+			maxSpeed = speedMod / width;
+			float scale = (maxSpeed * maxSpeed - rigid.velocity.sqrMagnitude);
+			offset.Normalize ();
+			offset.Scale (new Vector3 (scale, scale));
+		}
+		rigid.AddForce (offset);
 
 //		if (rigid.velocity.sqrMagnitude > maxSpeed * maxSpeed){
 //			rigid.velocity.Normalize();
@@ -40,7 +50,7 @@ public class BasePlayer : MonoBehaviour {
 //		}
 	}
 
-	void OnTriggerEnter2D( Collider2D col){
+	void OnTriggerStay2D( Collider2D col){
 
 		if (col.gameObject.tag == "food") {
 			Food colFood = col.gameObject.GetComponent<Food> ();
