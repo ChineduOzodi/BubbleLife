@@ -117,7 +117,9 @@ public class GameManager : MonoBehaviour
 		player = Instantiate (bubble, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
 		player.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 		player.transform.localScale = new Vector3(1.8f,1.8f);
-		player.AddComponent<Player>();
+		BasePlayer playerScript = player.AddComponent<Player>();
+		playerScript.isLeader = true;
+		playerScript.children = new List<BasePlayer> ();
 		//player.AddComponent<Rigidbody2D> ();
 		player.name = "player1";
 		player.tag = "Player";
@@ -142,8 +144,9 @@ public class GameManager : MonoBehaviour
 		ai.name = "AI";
 		ai.tag = "ai";
 		//ai.AddComponent<Rigidbody2D> ();
-		AI aiSCript = ai.AddComponent<AI>();
-
+		AI aiScript = ai.AddComponent<AI>();
+		aiScript.children = new List<BasePlayer> ();
+		aiScript.isLeader = true;
 		//ai.transform.SetParent (foodEmpty.transform);
 	}
 	private void AddFood (){

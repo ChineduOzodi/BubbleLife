@@ -84,12 +84,14 @@ public class AI : BasePlayer {
 		if (Vector3.Distance(closestEnemy,transform.position) < enemyMinDist) {
 			offset = closestEnemy - transform.position;
 			offset.Scale (new Vector3 (-1f, -1f));
+			Move (transform.position + offset);
 		} else {
-			offset = closestFood - transform.position;
+			Move (closestFood);
+			//offset = closestFood - transform.position;
 			//offset.Scale (new Vector3 (-1f, -1f));
-			offset.Normalize ();
-			offset.Scale (new Vector3 (speedMod / width, speedMod / width));
-			rigid.AddForce(offset);
+			//offset.Normalize ();
+			//offset.Scale (new Vector3 (speedMod / width, speedMod / width));
+			//rigid.AddForce(offset);
 		}
 //		if (enemyQ.Count > 0) {
 //			Collider2D col = enemyQ.Dequeue ();
@@ -135,8 +137,6 @@ public class AI : BasePlayer {
 //				transform.position = Vector3.MoveTowards (transform.position, foodFindpos, speedMod / width * Time.deltaTime);
 //			}
 //		}
-
-		Move ();
 
 	}
 }

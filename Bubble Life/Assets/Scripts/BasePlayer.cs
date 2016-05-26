@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BasePlayer : MonoBehaviour {
 
@@ -13,6 +14,12 @@ public class BasePlayer : MonoBehaviour {
 	protected float diffScale = .1f;
 	protected Rigidbody2D rigid;
 	protected Vector3 offset;
+	protected Queue<BasePlayer> bubbleGroup;
+	public bool isLeader = false;
+	public BasePlayer leader;
+	public List<BasePlayer> children;
+
+
 	protected void Eat(){
 		
 	}
@@ -27,7 +34,8 @@ public class BasePlayer : MonoBehaviour {
 		info = transform.GetComponentInChildren<Text> ();
 		rigid = gameObject.GetComponent<Rigidbody2D> ();
 	}
-	protected void Move(){
+	protected void Move(Vector3 target){
+		offset = target - transform.position;
 		if (transform.position.x < 0) {
 			offset = new Vector3 (10, 9);
 		} else if (transform.position.y < 0) {
@@ -43,6 +51,11 @@ public class BasePlayer : MonoBehaviour {
 			offset.Scale (new Vector3 (scale, scale));
 		}
 		rigid.AddForce (offset);
+		if (isLeader) {
+			for (int a = 0; a < children.Count; a++) {
+				children [a].transform.GetComponent<Rigidbody2D> ().AddForce (offset);
+			}
+		}
 
 //		if (rigid.velocity.sqrMagnitude > maxSpeed * maxSpeed){
 //			rigid.velocity.Normalize();
@@ -73,4 +86,31 @@ public class BasePlayer : MonoBehaviour {
 		
 	}
 
+	protected void Attack(){
+
+		GameObject obj = Instantiate (gameManager.bubble,transform.position,Quaternion.identity) as GameObject;
+		offset = offset * width;
+		obj.GetComponent<Rigidbody2D> ().velocity = rigid.velocity * width * .75f;
+		BasePlayer objPlayer = obj.AddComponent<BasePlayer> ();
+		obj.tag = transform.tag;
+		food = food / 2;
+		objPlayer.food = food;
+		UpdateSize ();
+		objPlayer.UpdateSize ();
+
+		if (isLeader) {
+			children.Add (objPlayer);
+			objPlayer.leader = transform.GetComponent<BasePlayer> ();
+
+		} else {
+			leader.AddChildren (objPlayer);
+			objPlayer.leader = leader;
+
+		}
+	}
+
+	public void AddChildren(BasePlayer child){
+		
+		children.Add (child);
+	}
 }
