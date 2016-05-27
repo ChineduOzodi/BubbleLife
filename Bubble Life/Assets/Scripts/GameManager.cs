@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
 	public int borderSize = 200;
 	public int foodLimit = 500;
 	public int aiCount = 20;
+    private int minFoodSize = 1;
+    private int maxFoodSize = 100;
 
 	public static GameManager instance = null;
 	string savePath;
@@ -109,7 +111,11 @@ public class GameManager : MonoBehaviour
 		//spawn Food
 		for (int i = 0; i < foodLimit; i++) {
 			AddFood ();
-		}
+            AddFood(2);
+            AddFood(3);
+            AddFood(1);
+            AddFood(5);
+        }
 
 		//Add Player
 		int index = UnityEngine.Random.Range (0, spawnLocations.Count);
@@ -118,8 +124,6 @@ public class GameManager : MonoBehaviour
 		player.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 		player.transform.localScale = new Vector3(1.8f,1.8f);
 		BasePlayer playerScript = player.AddComponent<Player>();
-		playerScript.isLeader = true;
-		playerScript.children = new List<BasePlayer> ();
 		//player.AddComponent<Rigidbody2D> ();
 		player.name = "player1";
 		player.tag = "Player";
@@ -145,25 +149,36 @@ public class GameManager : MonoBehaviour
 		ai.tag = "ai";
 		//ai.AddComponent<Rigidbody2D> ();
 		AI aiScript = ai.AddComponent<AI>();
-		aiScript.children = new List<BasePlayer> ();
-		aiScript.isLeader = true;
 		//ai.transform.SetParent (foodEmpty.transform);
 	}
 	private void AddFood (){
 		int index = UnityEngine.Random.Range (0, spawnLocations.Count);
-		Coord location = spawnLocations [index];
-		spawnLocations.RemoveAt (index);
+        int foodSize = UnityEngine.Random.Range(minFoodSize, maxFoodSize);
+        Coord location = spawnLocations [index];
 		GameObject bubbleFood = Instantiate (food, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
 		bubbleFood.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 		bubbleFood.transform.localScale = new Vector3(.56f,.56f);
-		Food bubbleFoodFood = bubbleFood.AddComponent<Food>();
-		bubbleFoodFood.coord = location;
+		BasePlayer bubbleFoodScript = bubbleFood.AddComponent<BasePlayer>();
+        bubbleFoodScript.food = foodSize;
+        bubbleFoodScript.UpdateSize();
 		bubbleFood.transform.SetParent (foodEmpty.transform);
 	}
+    public void AddFood(int size)
+    {
+        int index = UnityEngine.Random.Range(0, spawnLocations.Count);
+        int foodSize = size;
+        Coord location = spawnLocations[index];
+        GameObject bubbleFood = Instantiate(food, new Vector3(location.x, location.y), Quaternion.identity) as GameObject;
+        bubbleFood.GetComponent<SpriteRenderer>().color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        bubbleFood.transform.localScale = new Vector3(.56f, .56f);
+        BasePlayer bubbleFoodScript = bubbleFood.AddComponent<BasePlayer>();
+        bubbleFoodScript.food = foodSize;
+        bubbleFoodScript.UpdateSize();
+        bubbleFood.transform.SetParent(foodEmpty.transform);
+    }
 
-	public void AddFood (Coord coord){
+    public void AddFood (Coord coord){
 		AddFood ();
-		spawnLocations.Add (coord);
 	}
 
 	// Update is called once per frame

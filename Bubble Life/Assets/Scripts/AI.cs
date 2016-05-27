@@ -51,13 +51,13 @@ public class AI : BasePlayer {
 				}
 			} else {
 				BasePlayer colPlayer = col.gameObject.GetComponent<BasePlayer> ();
-				if (colPlayer.width > width * (1f + diffScale)) {
+				if (colPlayer.width > width) {
 					if (closestEnemy == Vector3.zero) {
 						closestEnemy = col.transform.position;
 					}else if (Vector3.Distance (transform.position, col.transform.position) < Vector3.Distance (transform.position, closestEnemy)) {
 						closestEnemy = col.transform.position;
 					}
-				} else if (colPlayer.width < width * (1f - diffScale)) {
+				} else if (colPlayer.width < width) {
 					if (closestPrey == Vector3.zero) {
 						closestPrey = col.transform.position;
 					} else if (Vector3.Distance (transform.position, col.transform.position) < Vector3.Distance (transform.position, closestPrey)) {

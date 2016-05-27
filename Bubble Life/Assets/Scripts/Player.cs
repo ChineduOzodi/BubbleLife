@@ -32,9 +32,8 @@ public class Player : BasePlayer {
 			//transform.Translate (new Vector3 (transX, transY));
 			if(Input.GetButtonDown("Jump")){
 
-				Attack();
-			}
-			Move (mousePosition);
+                Move(mousePosition);
+            }
 		}
 
 
