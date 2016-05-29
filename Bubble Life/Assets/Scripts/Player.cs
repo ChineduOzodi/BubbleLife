@@ -22,7 +22,8 @@ public class Player : BasePlayer {
 
 			//transform.position = Vector3.MoveTowards (transform.position, mousePosition, speedMod/ width * Time.deltaTime);
 			//gameObject.GetComponent<Rigidbody2D>().AddForce(offset);
-			Camera.main.orthographicSize = camSize + width * 2;
+			//Camera.main.orthographicSize = camSize + width * 2;
+			Camera.main.orthographicSize += Input.GetAxis("Mouse ScrollWheel") * -zoomSpeed;
 			Camera.main.transform.position = new Vector3(transform.position.x,transform.position.y,-1f);
 			//transform.position = Vector2.Lerp (transform.position, mousePosition, speedMod);
 			//float transX = Input.GetAxis ("Horizontal") * speedMod * Time.deltaTime;
