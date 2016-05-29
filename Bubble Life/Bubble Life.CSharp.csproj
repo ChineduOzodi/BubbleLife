@@ -58,26 +58,32 @@
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
+    <Reference Include="pseudoSinCos">
+      <HintPath>Assets\2DLightAsset\Scripts\Helpers\pseudoSinCos.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\2DLightAsset\Examples\RigidBodyInterpolationSolution\FollowLight2d.cs" />
+    <Compile Include="Assets\2DLightAsset\Scripts\2DLight\DynamicLight.cs" />
+    <Compile Include="Assets\2DLightAsset\Scripts\Helpers\interface_touch.cs" />
+    <Compile Include="Assets\2DLightAsset\Scripts\Helpers\interface_touch2.cs" />
+    <Compile Include="Assets\2DLightAsset\Scripts\rotate.cs" />
     <Compile Include="Assets\Scripts\AI.cs" />
     <Compile Include="Assets\Scripts\BasePlayer.cs" />
-    <Compile Include="Assets\Scripts\Coord.cs" />
-    <Compile Include="Assets\Scripts\Food.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Grid.cs" />
     <Compile Include="Assets\Scripts\Loader.cs" />
+    <Compile Include="Assets\Scripts\Node.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\SimpleAI.cs" />
     <Compile Include="Assets\Scripts\SpriteText.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\2DLightAsset\Shaders\Gradient-NoTexture-Radial-SingleColor-ToTransparent-RegularUV-AlphaBlend.shader" />
+    <None Include="Assets\2DLightAsset\Shaders\Gradient-ZFighting.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

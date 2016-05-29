@@ -8,7 +8,7 @@ public class BasePlayer : MonoBehaviour {
 	public int food = 10;
 	public float width = 1.8f;
 	protected GameManager gameManager;
-	protected float speedMod = 40;
+	protected float speedMod = 100;
 	protected float wallForce = 1;
 	protected Text info;
 	protected Rigidbody2D rigid;
@@ -20,9 +20,25 @@ public class BasePlayer : MonoBehaviour {
 	}
 
 	public void UpdateSize(){
-		width = Mathf.Sqrt (food / Mathf.PI);
-		transform.localScale = new Vector3 (width, width);
-	}
+        if (transform.tag != "food")
+        {
+            info.text = food.ToString();
+        }
+        if (food <= 0)
+        {
+            if (gameObject.tag == "Player")
+            {
+                gameManager.GameOver();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+        rigid.mass = food;
+        width = Mathf.Sqrt(food / Mathf.PI);
+        transform.localScale = new Vector3(width, width);
+    }
 
 	void Awake(){
 		gameManager = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameManager> ();
@@ -31,21 +47,28 @@ public class BasePlayer : MonoBehaviour {
 	}
 
 	void FixedUpdate(){
-		
-		if (transform.position.x < 0) {
-			offset = new Vector3 (wallForce, 0);
-			rigid.AddForce (offset);
-		} else if (transform.position.y < 0) {
-			offset = new Vector3 (0, wallForce);
-			rigid.AddForce (offset);
-		} else if (transform.position.x > gameManager.borderSize) {
-			offset = new Vector3 (-wallForce, 0);
-			rigid.AddForce (offset);
-		} else if (transform.position.y > gameManager.borderSize) {
-			offset = new Vector3 (0, -wallForce);
-			rigid.AddForce (offset);
-		}
-	}
+
+        if (transform.position.x < gameManager.minWorldPosX)
+        {
+            offset = new Vector3(wallForce, 0);
+            rigid.AddForce(offset);
+        }
+        else if (transform.position.y < gameManager.minWorldPosY)
+        {
+            offset = new Vector3(0, wallForce);
+            rigid.AddForce(offset);
+        }
+        else if (transform.position.x > gameManager.maxWorldPosX)
+        {
+            offset = new Vector3(-wallForce, 0);
+            rigid.AddForce(offset);
+        }
+        else if (transform.position.y > gameManager.maxWorldPosY)
+        {
+            offset = new Vector3(0, -wallForce);
+            rigid.AddForce(offset);
+        }
+    }
 	
     protected void Move(Vector3 target) {
         offset = target - transform.position;
@@ -67,19 +90,15 @@ public class BasePlayer : MonoBehaviour {
 	
 		if (col.gameObject.tag != "border") {
 			BasePlayer colScript = col.GetComponent<BasePlayer> ();
-			if (colScript.width < width && col.gameObject.tag != "Player") {
-				food += colScript.food;
-
-				Rigidbody2D colRigid = col.GetComponent<Rigidbody2D> ();
+			if (colScript.width < width) {
+				food ++;
+                colScript.food--;
+                Rigidbody2D colRigid = col.GetComponent<Rigidbody2D> ();
 				Vector2 newVelocity = InelasticCollision (rigid.mass, rigid.velocity, colRigid.mass, colRigid.velocity);
-                gameManager.AddFood(1);
-				Destroy (col.gameObject);
+                //gameManager.AddFood(1);
 				UpdateSize ();
+                colScript.UpdateSize();
 				rigid.velocity = newVelocity;
-                if (transform.tag != "food")
-                {
-                    info.text = food.ToString();
-                }
             }
             
         }
