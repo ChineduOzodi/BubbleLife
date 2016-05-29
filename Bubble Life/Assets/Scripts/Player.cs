@@ -5,6 +5,7 @@ public class Player : BasePlayer {
 
 	private Vector3 mousePosition;
 	private int camSize = 5;
+    private int zoomSpeed = 5;
 
 	// Use this for initialization
 	void Start () {
@@ -12,7 +13,7 @@ public class Player : BasePlayer {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 
 		if (!gameManager.setup) {
 			mousePosition = Input.mousePosition;
