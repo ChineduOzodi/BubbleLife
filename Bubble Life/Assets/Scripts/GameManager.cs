@@ -14,10 +14,16 @@ public class GameManager : MonoBehaviour
 	public Vector2 gridWorldSize;
     public float nodeRadius = 1;
     public LayerMask unwalkableMask;
-    public int foodLimit = 500;
-	public int aiCount = 20;
+
+    public int foodLimit;
+	public int aiCount;
     private int minFoodSize = 1;
-    private int maxFoodSize = 100;
+    private int maxFoodSize = 200;
+
+    public Shader playerShader;
+
+    [HideInInspector]
+    public int highestFoodCount = 0;
 
     public float minWorldPosX;
     public float minWorldPosY;
@@ -27,6 +33,7 @@ public class GameManager : MonoBehaviour
     // Save and Setup
     public static GameManager instance = null;
     List<Scorer> highScores;
+    private float lowestHighScoreTime;
     string playerName;
     string savePathPlayerName;
     string savePathHighScores;
@@ -43,6 +50,8 @@ public class GameManager : MonoBehaviour
 	GameObject foodEmpty;
     Grid grid;
 
+    float timer;
+
     //Main Menu UI Setup
     private Button menuStartButton;
     private Button menuExitButton;
@@ -56,7 +65,9 @@ public class GameManager : MonoBehaviour
     private Text gameOverText;
     private Button gameExitButton;
     private Button gameRestartButton;
+    private InputField menuEnterNameField;
     
+
 
 
     //private Button 
@@ -85,11 +96,13 @@ public class GameManager : MonoBehaviour
         {
             menu = true;
             RunMainMenuSetup();
+            
         }
         else if (levelInt == 1) //Game Level
         {
             menu = false;
             RunGameSetup();
+            timer = 0;
         }
     }
     private void RunMainMenuSetup()
@@ -98,10 +111,37 @@ public class GameManager : MonoBehaviour
         setup = true;
         menuStartButton = GameObject.FindGameObjectWithTag("start_button").GetComponent<Button>();
         menuExitButton = GameObject.FindGameObjectWithTag("exit_button").GetComponent<Button>();
+        menuEnterNameField = GameObject.FindGameObjectWithTag("name_input_field").GetComponent<InputField>();
+        highScoreText = GameObject.FindGameObjectWithTag("info").GetComponent<Text>();
 
         menuStartButton.onClick.AddListener(() => { StartGame(); });
         menuExitButton.onClick.AddListener(() => { ExitGame(); });
+        menuEnterNameField.onEndEdit.AddListener(delegate { SaveName(); });
+
+        //Name Setup
+        menuEnterNameField.text = playerName;
+
+        //HighScores Setup
+        HighScores();
+        
+
         setup = false;
+    }
+
+    private void HighScores()
+    {
+        string highScoresString = "";
+
+        for (int i = 0; i < highScores.Count; i++)
+        {
+            int m = i + 1;
+            string playerString =  String.Format("{0}. {1} s - {2}\n", m.ToString(), highScores[i].time.ToString(), highScores[i].name);
+            string dashes = new string('-', 30 - playerString.Length);
+            playerString = playerString.Insert(playerString.IndexOf('-'), dashes);
+            highScoresString += playerString;
+
+        }
+        highScoreText.text = highScoresString;
     }
 
     internal void ExitGame()
@@ -126,50 +166,87 @@ public class GameManager : MonoBehaviour
     {
         setup = true;
         gameOverPanel.SetActive(true);
-        if (player.GetComponent<Player>().food > 0)
+        if (player.GetComponent<Player>().food > highestFoodCount && timer < lowestHighScoreTime)
         {
-
+            // New High Score
+            gameOverText.text = "You made it on the Leaderboard!!\n" + timer.ToString() + " s";
+            for (int i = 0; i < highScores.Count; i++)
+            {
+                if (timer < highScores[i].time)
+                {
+                    highScores.Insert(i, new Scorer(playerName, Mathf.RoundToInt(timer)));
+                    break;
+                }
+            }
+            highScores.RemoveAt(10);
+            SaveHighScores();
+        }
+        else if (player.GetComponent<Player>().food > highestFoodCount)
+        {
+            //Won Game, no new high score
+            gameOverText.text = "You Won!!\n" + timer.ToString() + " s";
+        }
+        else
+        {
+            //Lost Game
+            gameOverText.text = "Game Over";
         }
     }
 
-    public void Save()
+    private void SaveName()
+    {
+        playerName = menuEnterNameField.text;
+
+        BinaryFormatter bf = new BinaryFormatter();
+
+        FileStream file = File.Create(savePathPlayerName);
+
+        bf.Serialize(file, playerName);
+        file.Close();
+    }
+
+    public void SaveHighScores()
 	{
-		try
-		{
-			//savePath = Application.persistentDataPath + "/World/" + worldGen.world.worldName + "_Auto Save.sav";//"worldGen.world.saveNum"
-		}
-		catch (DirectoryNotFoundException)
-		{
-			// Directory.CreateDirectory(Application.persistentDataPath + "/World/");
-			//savePath = Application.persistentDataPath + "/World/" + worldGen.world.worldName + "_Auto Save.sav";//"worldGen.world.saveNum"
-		}
-//		BinaryFormatter bf = new BinaryFormatter();
-//
-//		FileStream file = File.Create(savePath);
-//
-//		World world = worldGen.world;
-//		bf.Serialize(file, world);
-//		file.Close();
-//		worldGen.world.saveNum++;
-//		if (worldGen.world.saveNum > numAutoSave)
-//			worldGen.world.saveNum = 1;
-	}
+        BinaryFormatter bf = new BinaryFormatter();
+
+        FileStream file = File.Create(savePathHighScores);
+
+        bf.Serialize(file, highScores);
+        file.Close();
+
+        
+    }
 	public void Load()
 	{
-//		if (File.Exists(savePath))
-//		{
-//			BinaryFormatter bf = new BinaryFormatter();
-//			FileStream file = File.Open(savePath, FileMode.Open);
-//			worldGen.world = (World)bf.Deserialize(file);
-//			file.Close();
-//
-//			worldGen.loadWorld();
-//
-//		}
-	}
+        if (File.Exists(savePathHighScores))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(savePathHighScores, FileMode.Open);
+            highScores = (List<Scorer>)bf.Deserialize(file);
+            file.Close();
+        }
+        else
+        {
+            highScores = new List<Scorer>()
+            {
+                new Scorer(), new Scorer(), new Scorer(), new Scorer(), new Scorer(),
+                new Scorer(), new Scorer(), new Scorer(), new Scorer(), new Scorer()}; 
+        }
+        if (File.Exists(savePathPlayerName))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(savePathPlayerName, FileMode.Open);
+            playerName = (string)bf.Deserialize(file);
+            file.Close();
+        }
+        else { playerName = "Insert Player Name Here"; }
+
+        lowestHighScoreTime = highScores[9].time;
+    }
 
 	private void RunGameSetup(){
 		setup = true;
+        highestFoodCount = 0;
         //Setup Game UI
         gameRestartButton = GameObject.FindGameObjectWithTag("restart_button").GetComponent<Button>();
         gameExitButton = GameObject.FindGameObjectWithTag("exit_button").GetComponent<Button>();
@@ -261,6 +338,10 @@ public class GameManager : MonoBehaviour
     {
         int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
         int foodSize = UnityEngine.Random.Range(minFoodSize, maxFoodSize);
+        if (foodSize > highestFoodCount)
+        {
+            highestFoodCount = foodSize;
+        }
         Node node = grid.walkableNodes[index];
         GameObject bubbleFood = Instantiate(food, node.worldPosition, Quaternion.identity) as GameObject;
         bubbleFood.GetComponent<SpriteRenderer>().color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
@@ -274,6 +355,10 @@ public class GameManager : MonoBehaviour
     {
         int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
         int foodSize = size;
+        if (foodSize > highestFoodCount)
+        {
+            highestFoodCount = foodSize;
+        }
         Node node = grid.walkableNodes[index];
         GameObject bubbleFood = Instantiate(food, node.worldPosition, Quaternion.identity) as GameObject;
         bubbleFood.GetComponent<SpriteRenderer>().color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
@@ -291,9 +376,37 @@ public class GameManager : MonoBehaviour
         {
             ExitGame();
         }
+        if (!menu)
+        {
+            if (!setup)
+            {
+                Timer();
+                gameInfo.text = "Food Amount to Win: " + highestFoodCount;
+            }
+            
+        }
 	}
 
+    private void Timer()
+    {
+        timer += Time.deltaTime;
+        gameTimer.text = Mathf.Round(timer).ToString()+ " s";
+    }
+    [Serializable]
     private class Scorer
     {
+        internal string name;
+        internal int time;
+
+        public Scorer(string _name, int _time)
+        {
+            name = _name;
+            time = _time;
+        }
+        public Scorer()
+        {
+            name = "ABC";
+            time = 10000;
+        }
     }
 }

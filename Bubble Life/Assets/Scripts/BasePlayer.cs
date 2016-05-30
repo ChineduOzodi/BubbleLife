@@ -8,7 +8,7 @@ public class BasePlayer : MonoBehaviour {
 	public int food = 10;
 	public float width = 1.8f;
 	protected GameManager gameManager;
-	protected float speedMod = 100;
+	protected float speedMod = 400;
 	protected float wallForce = 1;
 	protected Text info;
 	protected Rigidbody2D rigid;
@@ -34,6 +34,18 @@ public class BasePlayer : MonoBehaviour {
             {
                 Destroy(gameObject);
             }
+        }
+        else if (food > gameManager.highestFoodCount)
+        {
+            if (gameObject.tag == "Player")
+            {
+                gameManager.GameOver();
+            }
+            else
+            {
+                gameManager.highestFoodCount = food;
+            }
+            
         }
         rigid.mass = food;
         width = Mathf.Sqrt(food / Mathf.PI);
@@ -94,7 +106,7 @@ public class BasePlayer : MonoBehaviour {
 				food ++;
                 colScript.food--;
                 Rigidbody2D colRigid = col.GetComponent<Rigidbody2D> ();
-				Vector2 newVelocity = InelasticCollision (rigid.mass, rigid.velocity, colRigid.mass, colRigid.velocity);
+				Vector2 newVelocity = InelasticCollision (rigid.mass, rigid.velocity, 1f, colRigid.velocity);
                 //gameManager.AddFood(1);
 				UpdateSize ();
                 colScript.UpdateSize();
