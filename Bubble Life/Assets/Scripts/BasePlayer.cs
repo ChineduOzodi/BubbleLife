@@ -28,7 +28,11 @@ public class BasePlayer : MonoBehaviour {
         {
             if (gameObject.tag == "Player")
             {
-                gameManager.GameOver();
+                if (!gameManager.setup)
+                {
+                    gameManager.GameOver();
+                }
+                
             }
             else
             {
@@ -39,7 +43,10 @@ public class BasePlayer : MonoBehaviour {
         {
             if (gameObject.tag == "Player")
             {
-                gameManager.GameOver();
+                if (!gameManager.setup)
+                {
+                    gameManager.GameOver();
+                }
             }
             else
             {

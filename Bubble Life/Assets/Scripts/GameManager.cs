@@ -135,9 +135,22 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < highScores.Count; i++)
         {
             int m = i + 1;
-            string playerString =  String.Format("{0}. {1} s - {2}\n", m.ToString(), highScores[i].time.ToString(), highScores[i].name);
-            string dashes = new string('-', 30 - playerString.Length);
-            playerString = playerString.Insert(playerString.IndexOf('-'), dashes);
+            string playerString = "";
+            if (m.ToString().Length == 2)
+            {
+                playerString = String.Format("{0}. {1} s - {2}\n", m.ToString(), highScores[i].time.ToString(), highScores[i].name);
+            }
+            else
+            {
+                playerString = String.Format("{0}.  {1} s - {2}\n", m.ToString(), highScores[i].time.ToString(), highScores[i].name);
+            }
+            
+            if (playerString.Length < 40)
+            {
+                string dashes = new string('-', 40 - playerString.Length);
+                playerString = playerString.Insert(playerString.IndexOf('-'), dashes);
+            }
+            
             highScoresString += playerString;
 
         }
@@ -239,7 +252,7 @@ public class GameManager : MonoBehaviour
             playerName = (string)bf.Deserialize(file);
             file.Close();
         }
-        else { playerName = "Insert Player Name Here"; }
+        else { playerName = "Player Name"; }
 
         lowestHighScoreTime = highScores[9].time;
     }
