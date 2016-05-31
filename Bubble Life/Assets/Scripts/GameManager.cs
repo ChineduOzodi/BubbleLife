@@ -10,8 +10,9 @@ using System.IO;
 
 public class GameManager : MonoBehaviour
 {
+    #region "Declarations"
     //Game Settings
-	public Vector2 gridWorldSize;
+    public Vector2 gridWorldSize;
     public float nodeRadius = 1;
     public LayerMask unwalkableMask;
 
@@ -66,12 +67,8 @@ public class GameManager : MonoBehaviour
     private Button gameExitButton;
     private Button gameRestartButton;
     private InputField menuEnterNameField;
-    
-
-
-
-    //private Button 
-
+    #endregion
+    #region "Monodevelop functions"
     // Use this for initialization
     void Awake()
 	{
@@ -90,6 +87,24 @@ public class GameManager : MonoBehaviour
         RunMainMenuSetup();
         
 	}
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKey("escape"))
+        {
+            ExitGame();
+        }
+        if (!menu)
+        {
+            if (!setup)
+            {
+                Timer();
+                gameInfo.text = "Food Amount to Win: " + highestFoodCount;
+            }
+
+        }
+    }
     void OnLevelWasLoaded(int levelInt)
     {
         if(levelInt == 0) //Main Menu
@@ -105,6 +120,8 @@ public class GameManager : MonoBehaviour
             timer = 0;
         }
     }
+
+    #endregion
     private void RunMainMenuSetup()
     {
         //Button Setup
@@ -382,23 +399,7 @@ public class GameManager : MonoBehaviour
         bubbleFood.transform.SetParent(foodEmpty.transform);
     }
 
-    // Update is called once per frame
-    void Update()
-	{
-        if (Input.GetKey("escape"))
-        {
-            ExitGame();
-        }
-        if (!menu)
-        {
-            if (!setup)
-            {
-                Timer();
-                gameInfo.text = "Food Amount to Win: " + highestFoodCount;
-            }
-            
-        }
-	}
+   
 
     private void Timer()
     {
