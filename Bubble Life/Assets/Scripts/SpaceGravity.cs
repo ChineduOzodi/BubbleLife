@@ -70,7 +70,7 @@ public class SpaceGravity : MonoBehaviour {
 
 
                 }
-
+                Vector3 CMPos = force + objs[b].transform.position;
                 //Apply Velocity
                 //Vector3 force = univGrav(m1, m2, distance) * Time.deltaTime;
                 Vector3 vel = CentripicalForceVel(m1, distance.magnitude, force.magnitude) * Tangent(force.normalized) + new Vector3(m2Vel.x, m2Vel.y);
