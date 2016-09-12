@@ -47,9 +47,11 @@ public class SpaceGravity : MonoBehaviour {
                 float m2 = M1;
                 Vector3 m2Pos = objs[M1PosInd].transform.position;
                 Vector2 m2Vel = objs[M1PosInd].GetComponent<Rigidbody2D>().velocity;
-                Vector3 distance = m2Pos - objs[b].transform.position;
+                Vector3 m2r = m2Pos - objs[b].transform.position;
+                float CM = M1;
+                Vector3 CMP = objs[M1PosInd].transform.position * M1;
 
-                Vector3 force = univGrav(m1, m2, distance) * Time.deltaTime;
+                Vector3 force = univGrav(m1, m2, m2r) * Time.deltaTime;
 
                 for (int c = 0; c < objs.Length; c++)
                 {
@@ -57,23 +59,24 @@ public class SpaceGravity : MonoBehaviour {
                     {
                         Vector3 otherDist = objs[c].transform.position - objs[b].transform.position;
 
-                        if (otherDist.sqrMagnitude < distance.sqrMagnitude && (otherDist.magnitude - objs[c].GetComponent<SpaceTrajectory>().SOI) < 0)
+                        if (otherDist.sqrMagnitude < m2r.sqrMagnitude && (otherDist.magnitude - objs[c].GetComponent<SpaceTrajectory>().SOI) < 0)
                         {
                             m2Pos = objs[c].transform.position;
                             m2 = objs[c].GetComponent<Rigidbody2D>().mass;
                             m2Vel += objs[c].GetComponent<Rigidbody2D>().velocity;
-                            distance = m2Pos - objs[b].transform.position;
-
-                            force += univGrav(m1, m2, distance) * Time.deltaTime;
+                            m2r = m2Pos - objs[b].transform.position;
+                            CM += m2;
+                            CMP += m2 * m2r;
+                            force += univGrav(m1, m2, m2r) * Time.deltaTime;
                         }
                     }
 
 
                 }
-                Vector3 CMPos = force + objs[b].transform.position;
+                Vector3 CMr = CMP / CM;
                 //Apply Velocity
                 //Vector3 force = univGrav(m1, m2, distance) * Time.deltaTime;
-                Vector3 vel = CentripicalForceVel(m1, distance.magnitude, force.magnitude) * Tangent(force.normalized) + new Vector3(m2Vel.x, m2Vel.y);
+                Vector3 vel = CentripicalForceVel(m1, m2r.magnitude, force.magnitude) * Tangent(force.normalized) + new Vector3(m2Vel.x, m2Vel.y);
                 objs[b].GetComponent<Rigidbody2D>().velocity = vel;
 
             }
