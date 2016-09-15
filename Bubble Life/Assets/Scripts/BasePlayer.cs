@@ -7,7 +7,7 @@ public class BasePlayer : MonoBehaviour {
 
 	public int food = 10;
 	public float width = 1.8f;
-	protected GameManager gameManager;
+	protected GameController gameManager;
 	protected float speedMod = 400;
 	protected float wallForce = 1;
 	protected Text info;
@@ -60,7 +60,7 @@ public class BasePlayer : MonoBehaviour {
     }
 
 	void Awake(){
-		gameManager = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameManager> ();
+		gameManager = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameController> ();
 		info = transform.GetComponentInChildren<Text> ();
 		rigid = gameObject.GetComponent<Rigidbody2D> ();
 	}
