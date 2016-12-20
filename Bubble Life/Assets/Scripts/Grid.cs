@@ -10,6 +10,7 @@ public class Grid : MonoBehaviour {
     public List<Node> walkableNodes;
 
     protected GameController gameManager;
+    internal LevelScript levelScript;
 
     float nodeDiameter;
     public int gridSizeX, gridSizeY;
@@ -18,9 +19,8 @@ public class Grid : MonoBehaviour {
     {
         //Get info from gameManager
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        gridWorldSize = gameManager.gridWorldSize;
-        nodeRadius = gameManager.nodeRadius;
-        unwalkableMask = gameManager.unwalkableMask;
+        gridWorldSize = levelScript.gridWorldSize;
+        nodeRadius = .5f;
 
         nodeDiameter = nodeRadius * 2;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);

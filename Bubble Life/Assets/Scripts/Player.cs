@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class Player : BasePlayer {
 
@@ -15,7 +16,7 @@ public class Player : BasePlayer {
 	// Update is called once per frame
 	void FixedUpdate () {
 
-		if (!gameManager.setup) {
+		if (!levelScript.setup) {
 			mousePosition = Input.mousePosition;
 			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
 			mousePosition.z = transform.position.z;
@@ -32,13 +33,18 @@ public class Player : BasePlayer {
 			//print (transX.ToString () + transY.ToString ());
 			//transform.rotation = new Quaternion();
 			//transform.Translate (new Vector3 (transX, transY));
-			if(Input.GetButtonDown("Jump")){
+			if(Input.GetButton("Jump")){
 
-                Move(mousePosition);
+                Move();
             }
 		}
 
 
 
 	}
+
+    private void Move()
+    {
+        throw new NotImplementedException();
+    }
 }
