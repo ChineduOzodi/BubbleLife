@@ -11,10 +11,11 @@ public class BasePlayer : MonoBehaviour {
     protected GameController gameController;
     protected LevelScript levelScript;
     public int health = 100;
-    public float projectilePower;
+    public float projectilePower = 10;
 
 
     public float speedMod = 400;
+    public float turnSpeed = 200;
 	protected float force = 1;
 	protected Text info;
 	protected Rigidbody2D rigid;
@@ -61,7 +62,8 @@ public class BasePlayer : MonoBehaviour {
 
 	protected void Attack(){
 
-		GameObject obj = Instantiate (projectile,transform.position,Quaternion.identity) as GameObject;
+		GameObject obj = Instantiate (projectile,gunLocation.transform.position,Quaternion.identity) as GameObject;
+        obj.transform.rotation = transform.rotation;
         obj.GetComponent<Rigidbody2D>().velocity = rigid.velocity + (Vector2)(gunLocation.transform.up * projectilePower);
 	}
 

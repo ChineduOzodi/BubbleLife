@@ -108,6 +108,10 @@
   <ItemGroup>
     <None Include="Assets\CodeControl\changelog.txt" />
     <None Include="Assets\CodeControl\readme.txt" />
+    <None Include="Assets\GooglePlayGames\Editor\template-AndroidManifest.txt" />
+    <None Include="Assets\GooglePlayGames\Editor\template-Constants.txt" />
+    <None Include="Assets\GooglePlayGames\Editor\template-GameInfo.txt" />
+    <None Include="Assets\PlayServicesResolver\Editor\play-services-resolver.txt" />
     <None Include="Assets\SFSoftShadows\Resources\SFFogLayer.shader" />
     <None Include="Assets\SFSoftShadows\Resources\SFLightBlendLinear.shader" />
     <None Include="Assets\SFSoftShadows\Resources\SFLightBlendSoft.shader" />

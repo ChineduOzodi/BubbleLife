@@ -20,31 +20,29 @@ public class Player : BasePlayer {
 			mousePosition = Input.mousePosition;
 			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
 			mousePosition.z = transform.position.z;
-			//offset = mousePosition - transform.position;
 
-			//transform.position = Vector3.MoveTowards (transform.position, mousePosition, speedMod/ width * Time.deltaTime);
-			//gameObject.GetComponent<Rigidbody2D>().AddForce(offset);
 			//Camera.main.orthographicSize = camSize + width * 2;
 			Camera.main.orthographicSize += Input.GetAxis("Mouse ScrollWheel") * -zoomSpeed;
 			Camera.main.transform.position = new Vector3(transform.position.x,transform.position.y,-1f);
-			//transform.position = Vector2.Lerp (transform.position, mousePosition, speedMod);
-			//float transX = Input.GetAxis ("Horizontal") * speedMod * Time.deltaTime;
-			//float transY = Input.GetAxis ("Vertical") * speedMod * Time.deltaTime;
+
+			float transX = Input.GetAxis ("Horizontal") * turnSpeed * Time.deltaTime;
+			float transY = Input.GetAxis ("Vertical") * turnSpeed * Time.deltaTime;
+
 			//print (transX.ToString () + transY.ToString ());
-			//transform.rotation = new Quaternion();
-			//transform.Translate (new Vector3 (transX, transY));
+			transform.Rotate(new Vector3(0,0,-transX));
+			//transform.Translate (new Vector3 (trans90=-p0oiuyg=]-[098juhygtr=76-0987656tre8765trewsaerwq32Q X, transY));
 			if(Input.GetButton("Jump")){
 
                 Move();
+            }
+
+            if (Input.GetButtonDown("Fire1"))
+            {
+                Attack();
             }
 		}
 
 
 
 	}
-
-    private void Move()
-    {
-        throw new NotImplementedException();
-    }
 }
