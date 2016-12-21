@@ -17,6 +17,7 @@ public class AsteroidController : MonoBehaviour {
     void Start () {
 
         rigid = gameObject.GetComponent<Rigidbody2D>();
+        health = 100;
 
     }
 	
@@ -47,12 +48,16 @@ public class AsteroidController : MonoBehaviour {
     protected void Divide()
     {
         GameObject obj = Instantiate(divideAsteroid, transform.position, Quaternion.identity) as GameObject;
-        obj.GetComponent<Rigidbody2D>().velocity = rigid.velocity;
-        obj.GetComponent<Rigidbody2D>().AddForce((obj.transform.up) * divideForce);
+        obj.transform.rotation = gameObject.transform.rotation;
+        obj.transform.position += ((obj.transform.up) * 2f);
+        obj.transform.localScale = gameObject.transform.localScale * .5f;
+        obj.GetComponent<Rigidbody2D>().velocity = rigid.velocity + (Vector2)((obj.transform.up) * divideForce);
 
         GameObject obj2 = Instantiate(divideAsteroid, transform.position, Quaternion.identity) as GameObject;
-        obj2.GetComponent<Rigidbody2D>().velocity = rigid.velocity;
-        obj2.GetComponent<Rigidbody2D>().AddForce((obj.transform.up) * -divideForce);
+        obj2.transform.localScale = gameObject.transform.localScale * .5f;
+        obj2.transform.rotation = gameObject.transform.rotation;
+        obj2.transform.position += ((obj.transform.up) * -2f);
+        obj2.GetComponent<Rigidbody2D>().velocity = rigid.velocity + (Vector2)((obj.transform.up) * -divideForce);
 
         Explode();
     }
