@@ -7,11 +7,6 @@ public class Player : BasePlayer {
 	private Vector3 mousePosition;
 	private int camSize = 5;
     private int zoomSpeed = 5;
-
-	// Use this for initialization
-	void Start () {
-	
-	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
@@ -32,8 +27,12 @@ public class Player : BasePlayer {
 			transform.Rotate(new Vector3(0,0,-transX));
 			//transform.Translate (new Vector3 (trans90=-p0oiuyg=]-[098juhygtr=76-0987656tre8765trewsaerwq32Q X, transY));
 			if(Input.GetButton("Jump")){
-
+                playerFlame.gameObject.SetActive(true);
                 Move();
+            }
+            else
+            {
+                playerFlame.gameObject.SetActive(false);
             }
 
             if (Input.GetButtonDown("Fire1"))
@@ -42,7 +41,7 @@ public class Player : BasePlayer {
             }
 		}
 
-
-
 	}
+
+    
 }

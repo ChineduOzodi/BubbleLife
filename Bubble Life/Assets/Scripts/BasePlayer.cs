@@ -3,14 +3,15 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class BasePlayer : MonoBehaviour {
+public class BasePlayer : BaseObject {
 
     public GameObject projectile;
     public GameObject gunLocation;
+    public GameObject playerFlame;
 
     protected GameController gameController;
-    protected LevelScript levelScript;
-    public int health = 100;
+    
+    public float health = 100;
     public float projectilePower = 10;
 
 
@@ -18,43 +19,53 @@ public class BasePlayer : MonoBehaviour {
     public float turnSpeed = 200;
 	protected float force = 1;
 	protected Text info;
-	protected Rigidbody2D rigid;
+	
 	protected Vector3 offset;
-    
 
-    void Awake(){
-		gameController = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameController> ();
-        levelScript = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelScript>();
+    private bool impact = false;
+
+
+    void start(){
+        
+
+        if (!levelScript.debug)
+        {
+            gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        }
+        
+        
 
 		info = transform.GetComponentInChildren<Text> ();
-		rigid = gameObject.GetComponent<Rigidbody2D> ();
+		
+        playerFlame.gameObject.SetActive(false);
 	}
 
-	void FixedUpdate(){
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        Rigidbody2D colRigid = col.transform.GetComponent<Rigidbody2D>();
+        Vector2 finalVel = InelasticCollision(rigid.mass, rigid.velocity, colRigid.mass, colRigid.velocity);
 
-        if (transform.position.x < levelScript.minWorldPosX)
+        float damage = Mathf.Abs(rigid.velocity.magnitude - finalVel.magnitude);
+
+        health -= damage;
+
+        if (col.transform.tag == "Player")
         {
-            offset = new Vector3(force, 0);
-            rigid.AddForce(offset);
+            //col.transform.GetComponent<Player>().health -= 10;
+            //print("Hit " + col.transform.tag);
         }
-        else if (transform.position.y < levelScript.minWorldPosY)
+        else if (col.transform.tag == "Asteroid")
         {
-            offset = new Vector3(0, force);
-            rigid.AddForce(offset);
+            col.transform.GetComponent<AsteroidController>().health -= Mathf.Abs(colRigid.velocity.magnitude - finalVel.magnitude);
+            print("Hit Asteroid: " + health.ToString("0.00"));
         }
-        else if (transform.position.x > levelScript.maxWorldPosX)
+        else
         {
-            offset = new Vector3(-force, 0);
-            rigid.AddForce(offset);
-        }
-        else if (transform.position.y > levelScript.maxWorldPosY)
-        {
-            offset = new Vector3(0, -force);
-            rigid.AddForce(offset);
+            //print("Hit " + col.transform.tag);
         }
     }
 
-	protected Vector2 InelasticCollision (float mass1, Vector2 vel1, float mass2, Vector2 vel2){
+    public static Vector2 InelasticCollision (float mass1, Vector2 vel1, float mass2, Vector2 vel2){
 
 		Vector2 finalVel = (mass1 * vel1 + mass2 * vel2) / (mass1 + mass2);
 		return finalVel;

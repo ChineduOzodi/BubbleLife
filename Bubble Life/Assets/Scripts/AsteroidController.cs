@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class AsteroidController : MonoBehaviour {
+public class AsteroidController : BaseObject {
 
     public float health = 100;
     public float size;
@@ -11,12 +11,9 @@ public class AsteroidController : MonoBehaviour {
 
     public GameObject divideAsteroid;
 
-    protected Rigidbody2D rigid;
-
     // Use this for initialization
     void Start () {
 
-        rigid = gameObject.GetComponent<Rigidbody2D>();
         health = 100;
 
     }

@@ -14,15 +14,17 @@ public class LevelScript : MonoBehaviour {
     public GameObject border;
     public GameObject[] asteroids;
     public GameObject aiOpponent;
+    public GameObject playerInstance;
     private GameObject player;
 
     public int asteroidCount;
     public int aiCount;
     public int minAsteroidSize = 1;
     public int maxAsteroidSize = 10;
+    public float minAsteroidVel = 0;
+    public float maxAsteroidVel = 10;
 
     //Organizational Components
-    GameObject borderEmpty;
     GameObject asteroidEmpty;
 
     //To help instantiation of objects work better
@@ -44,15 +46,20 @@ public class LevelScript : MonoBehaviour {
     internal float minWorldPosY;
     internal float maxWorldPosX;
     internal float maxWorldPosY;
-    public bool setup;
+    internal bool setup;
+    public bool debug;
 
     //Game timer
     float timer;
 
     // Use this for initialization
     void Start () {
-
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        if (!debug)
+        {
+            gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        }
+        
+        RunGameSetup();
 
     }
 	
@@ -69,6 +76,7 @@ public class LevelScript : MonoBehaviour {
 
     private void RunGameSetup()
     {
+        
         //Setup Game UI
         gameRestartButton = GameObject.FindGameObjectWithTag("restart_button").GetComponent<Button>();
         gameExitButton = GameObject.FindGameObjectWithTag("exit_button").GetComponent<Button>();
@@ -89,7 +97,6 @@ public class LevelScript : MonoBehaviour {
         grid = new GameObject("Grid").AddComponent<Grid>();
         grid.levelScript = this;
 
-        borderEmpty = new GameObject("border");
         asteroidEmpty = new GameObject("food");
 
         minWorldPosX = grid.grid[0, 0].worldPosition.x;
@@ -97,18 +104,8 @@ public class LevelScript : MonoBehaviour {
         maxWorldPosX = grid.grid[grid.gridSizeX - 1, grid.gridSizeY - 1].worldPosition.x;
         maxWorldPosY = grid.grid[grid.gridSizeX - 1, grid.gridSizeY - 1].worldPosition.y;
 
-        for (int x = 0; x < grid.gridSizeX; x++)
-        {
-            for (int y = 0; y < grid.gridSizeY; y++)
-            {
-                if (x == 0 || y == 0 || x + 1 == grid.gridSizeX || y + 1 == grid.gridSizeY)
-                {
-                    GameObject borderBlock = Instantiate(border, grid.grid[x, y].worldPosition, Quaternion.identity) as GameObject;
-                    borderBlock.transform.SetParent(borderEmpty.transform);
-                }
-            }
-
-        }
+        GameObject borderBlock = Instantiate(border, Vector3.zero, Quaternion.identity) as GameObject;
+        borderBlock.transform.localScale = new Vector3(gridWorldSize.x, gridWorldSize.y, 1);
 
         grid.CreateGrid();
 
@@ -124,10 +121,10 @@ public class LevelScript : MonoBehaviour {
         //Add Player
         int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
         Node node = grid.walkableNodes[index];
-        player = Instantiate(aiOpponent, node.worldPosition, Quaternion.identity) as GameObject;
-        player.GetComponent<SpriteRenderer>().color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-        player.transform.localScale = new Vector3(1.8f, 1.8f);
-        BasePlayer playerScript = player.AddComponent<Player>();
+        player = Instantiate(playerInstance, node.worldPosition, Quaternion.identity) as GameObject;
+        //player.GetComponent<SpriteRenderer>().color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        //player.transform.localScale = new Vector3(1.8f, 1.8f);
+        //BasePlayer playerScript = player.AddComponent<Player>();
         player.name = "player1";
         player.tag = "Player";
 
@@ -154,10 +151,14 @@ public class LevelScript : MonoBehaviour {
     {
         int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
         int asteroidSize = UnityEngine.Random.Range(minAsteroidSize, maxAsteroidSize);
+        float asteroidVel = UnityEngine.Random.Range(minAsteroidVel, maxAsteroidVel);
+        Vector2 velDirection = Random.insideUnitCircle.normalized;
+
         GameObject asteroid = asteroids[UnityEngine.Random.Range(0, asteroids.Length)];
         Node node = grid.walkableNodes[index];
         GameObject asteroidObj = Instantiate(asteroid, node.worldPosition, Quaternion.identity) as GameObject;
         asteroidObj.transform.localScale = new Vector3(asteroidSize, asteroidSize);
+        asteroidObj.GetComponent<Rigidbody2D>().velocity = velDirection * asteroidVel;
         asteroidObj.transform.SetParent(asteroidEmpty.transform);
     }
 
@@ -219,7 +220,7 @@ public class LevelScript : MonoBehaviour {
     private void Timer()
     {
         timer += Time.deltaTime;
-        gameTimer.text = Mathf.Round(timer).ToString() + " s";
+        gameTimer.text = "Health: " + player.GetComponent<Player>().health;
     }
     private void RestartGame()
     {

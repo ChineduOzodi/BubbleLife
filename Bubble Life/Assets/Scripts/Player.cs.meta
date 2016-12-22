@@ -1,10 +1,16 @@
 fileFormatVersion: 2
 guid: fa65cf54c39c00e46916b707bee15781
-timeCreated: 1463600758
+timeCreated: 1482392455
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - projectile: {fileID: 1000012057957576, guid: 8393b5e2b2694a3428f17175ef77cf70,
+      type: 2}
+  - gunLocation: {fileID: 1000011103802842, guid: dc287b4e1b8359541b190430ac88cf1f,
+      type: 2}
+  - playerFlame: {fileID: 1000013197610440, guid: dc287b4e1b8359541b190430ac88cf1f,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

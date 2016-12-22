@@ -9,7 +9,6 @@ public class Grid : MonoBehaviour {
     public Node[,] grid;
     public List<Node> walkableNodes;
 
-    protected GameController gameManager;
     internal LevelScript levelScript;
 
     float nodeDiameter;
@@ -17,8 +16,7 @@ public class Grid : MonoBehaviour {
 
     void Awake()
     {
-        //Get info from gameManager
-        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        levelScript = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelScript>();
         gridWorldSize = levelScript.gridWorldSize;
         nodeRadius = .5f;
 
