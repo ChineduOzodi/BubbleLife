@@ -3,6 +3,7 @@ using System.Collections;
 
 public class BaseObject : MonoBehaviour {
 
+    public float health = 100;
     protected LevelScript levelScript;
     protected Rigidbody2D rigid;
 
@@ -34,5 +35,23 @@ public class BaseObject : MonoBehaviour {
             transform.position = new Vector3(transform.position.x, levelScript.minWorldPosY, transform.position.z);
         }
 
+    }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        Rigidbody2D colRigid = col.transform.GetComponent<Rigidbody2D>();
+        Vector2 finalVel = InelasticCollision(rigid.mass, rigid.velocity, colRigid.mass, colRigid.velocity);
+
+        float damage = Mathf.Abs(rigid.velocity.magnitude - finalVel.magnitude);
+
+        health -= damage;
+
+    }
+
+    public static Vector2 InelasticCollision(float mass1, Vector2 vel1, float mass2, Vector2 vel2)
+    {
+
+        Vector2 finalVel = (mass1 * vel1 + mass2 * vel2) / (mass1 + mass2);
+        return finalVel;
     }
 }

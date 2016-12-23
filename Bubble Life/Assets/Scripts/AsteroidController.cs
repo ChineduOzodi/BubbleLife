@@ -4,7 +4,6 @@ using System;
 
 public class AsteroidController : BaseObject {
 
-    public float health = 100;
     public float size;
     public float divideForce = 1;
     public float unitSize;

@@ -165,6 +165,7 @@ public class LevelScript : MonoBehaviour {
     internal void GameOver()
     {
         setup = true;
+        Time.timeScale = .001f;
         gameOverPanel.SetActive(true);
         //if (player.GetComponent<Player>().food > highestFoodCount && timer < lowestHighScoreTime)
         //{
@@ -224,6 +225,6 @@ public class LevelScript : MonoBehaviour {
     }
     private void RestartGame()
     {
-        SceneManager.LoadScene("level");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

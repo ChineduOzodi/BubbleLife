@@ -10,8 +10,9 @@ public class BasePlayer : BaseObject {
     public GameObject playerFlame;
 
     protected GameController gameController;
+    protected Animator animator;
     
-    public float health = 100;
+    
     public float projectilePower = 10;
 
 
@@ -22,11 +23,11 @@ public class BasePlayer : BaseObject {
 	
 	protected Vector3 offset;
 
-    private bool impact = false;
+    public bool destroy = false;
 
 
-    void start(){
-        
+    public void Start(){
+        animator = GetComponent<Animator>();
 
         if (!levelScript.debug)
         {
@@ -40,37 +41,18 @@ public class BasePlayer : BaseObject {
         playerFlame.gameObject.SetActive(false);
 	}
 
-    void OnCollisionEnter2D(Collision2D col)
+    void Update()
     {
-        Rigidbody2D colRigid = col.transform.GetComponent<Rigidbody2D>();
-        Vector2 finalVel = InelasticCollision(rigid.mass, rigid.velocity, colRigid.mass, colRigid.velocity);
-
-        float damage = Mathf.Abs(rigid.velocity.magnitude - finalVel.magnitude);
-
-        health -= damage;
-
-        if (col.transform.tag == "Player")
+        if (health < 0)
         {
-            //col.transform.GetComponent<Player>().health -= 10;
-            //print("Hit " + col.transform.tag);
+            animator.SetBool("isDead", true);
         }
-        else if (col.transform.tag == "Asteroid")
+        if (destroy)
         {
-            col.transform.GetComponent<AsteroidController>().health -= Mathf.Abs(colRigid.velocity.magnitude - finalVel.magnitude);
-            print("Hit Asteroid: " + health.ToString("0.00"));
-        }
-        else
-        {
-            //print("Hit " + col.transform.tag);
+            levelScript.GameOver();
+            Dead();
         }
     }
-
-    public static Vector2 InelasticCollision (float mass1, Vector2 vel1, float mass2, Vector2 vel2){
-
-		Vector2 finalVel = (mass1 * vel1 + mass2 * vel2) / (mass1 + mass2);
-		return finalVel;
-	}
-
 	protected void Attack(){
 
 		GameObject obj = Instantiate (projectile,gunLocation.transform.position,Quaternion.identity) as GameObject;
@@ -81,5 +63,10 @@ public class BasePlayer : BaseObject {
     protected void Move()
     {
         rigid.AddRelativeForce(Vector2.up * speedMod * Time.deltaTime);
+    }
+
+    protected void Dead()
+    {
+        Destroy(gameObject);
     }
 }
