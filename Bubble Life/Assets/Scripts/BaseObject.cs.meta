@@ -1,10 +1,11 @@
 fileFormatVersion: 2
 guid: f3ef4d35e64fb31429cc5127f5a60a95
-timeCreated: 1482390554
+timeCreated: 1482985198
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - laserHit: {fileID: 8300000, guid: 4ea61e0576c1b174ca2a91c388db949e, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -15,7 +15,9 @@ public class LevelScript : MonoBehaviour {
     public GameObject[] asteroids;
     public GameObject aiOpponent;
     public GameObject playerInstance;
+
     private GameObject player;
+    protected AudioSource source;
 
     public int asteroidCount;
     public int aiCount;
@@ -54,13 +56,14 @@ public class LevelScript : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        source = GetComponent<AudioSource>();
+
         if (!debug)
         {
             gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         }
         
         RunGameSetup();
-
     }
 	
 	// Update is called once per frame

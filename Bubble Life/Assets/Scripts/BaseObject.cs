@@ -4,19 +4,32 @@ using System.Collections;
 public class BaseObject : MonoBehaviour {
 
     public float health = 100;
+    public AudioClip laserHit;
+    public AudioClip crashSound;
+
     protected LevelScript levelScript;
     protected Rigidbody2D rigid;
+    protected Animator animator;
+    protected AudioSource source;
+
+    private float volLow = .5f;
+    private float volHigh = 1f;
+    private float freqLow = .75f;
+    private float freqHigh = 1.25f;
+
+    private float velMod = .1f;
 
     // Use this for initialization
     void Awake () {
-
+        animator = GetComponent<Animator>();
+        source = GetComponent<AudioSource>();
         levelScript = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelScript>();
         rigid = gameObject.GetComponent<Rigidbody2D>();
 
     }
 	
 	// Update is called once per frame
-	void Update () {
+	protected void CheckBorder () {
 
         if (transform.position.x < levelScript.minWorldPosX)
         {
@@ -44,7 +57,19 @@ public class BaseObject : MonoBehaviour {
 
         float damage = Mathf.Abs(rigid.velocity.magnitude - finalVel.magnitude);
 
-        health -= damage;
+        health -= damage * damage;
+
+        if (col.transform.tag == "Projectile")
+        {
+            source.pitch = 1;
+            source.PlayOneShot(laserHit, Random.Range(.5f, 1f));
+        }
+        else if (col.transform.tag == "Asteroid")
+        {
+            source.pitch = Random.Range(freqLow, freqHigh);
+            float vol = Random.Range(volLow, volHigh) * rigid.velocity.sqrMagnitude * velMod;
+            source.PlayOneShot(crashSound, vol);
+        }
 
     }
 

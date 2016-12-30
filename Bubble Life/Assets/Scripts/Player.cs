@@ -9,7 +9,7 @@ public class Player : BasePlayer {
     private int zoomSpeed = 5;
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update() {
 
 		if (!levelScript.setup) {
 			mousePosition = Input.mousePosition;
@@ -25,20 +25,30 @@ public class Player : BasePlayer {
 
 			//print (transX.ToString () + transY.ToString ());
 			transform.Rotate(new Vector3(0,0,-transX));
-			//transform.Translate (new Vector3 (trans90=-p0oiuyg=]-[098juhygtr=76-0987656tre8765trewsaerwq32Q X, transY));
-			if(Input.GetButton("Jump")){
+            //transform.Translate (new Vector3 (trans90=-p0oiuyg=]-[098juhygtr=76-0987656tre8765trewsaerwq32Q X, transY));
+
+            if (Input.GetButton("Jump") && playerFlame.activeSelf == false)
+            {
                 playerFlame.gameObject.SetActive(true);
+                source.Play();
                 Move();
             }
-            else
+            else if (Input.GetButton("Jump")){
+                Move();
+            }
+            else if (playerFlame.activeSelf == true)
             {
                 playerFlame.gameObject.SetActive(false);
+                source.Stop();
             }
 
             if (Input.GetButtonDown("Fire1"))
             {
                 Attack();
             }
+
+            CheckBorder();
+            CheckHealth();
 		}
 
 	}

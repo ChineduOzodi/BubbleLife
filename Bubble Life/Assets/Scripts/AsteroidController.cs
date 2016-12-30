@@ -9,6 +9,7 @@ public class AsteroidController : BaseObject {
     public float unitSize;
 
     public GameObject divideAsteroid;
+    
 
     // Use this for initialization
     void Start () {
@@ -29,16 +30,13 @@ public class AsteroidController : BaseObject {
             else
                 Divide();
         }
-	
+        CheckBorder();
 	}
 
     private void Explode()
     {
-        //TODO: play explosion
-
+        //TODO: play explosion      
         Destroy(gameObject);
-
-
     }
 
     protected void Divide()
