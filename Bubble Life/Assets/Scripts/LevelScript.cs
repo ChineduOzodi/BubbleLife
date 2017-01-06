@@ -4,19 +4,20 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using NeuralNetwork;
 
 public class LevelScript : MonoBehaviour {
 
-    //GameController Script
-    private GameController gameController;
+    protected GameController gameController;
 
     //Game Setup
     public GameObject border;
+    public GameObject starInstance;
     public GameObject[] asteroids;
     public GameObject aiOpponent;
     public GameObject playerInstance;
 
-    private GameObject player;
+    protected GameObject player;
     protected AudioSource source;
 
     public int asteroidCount;
@@ -26,20 +27,24 @@ public class LevelScript : MonoBehaviour {
     public float minAsteroidVel = 0;
     public float maxAsteroidVel = 10;
 
+    protected int starCount = 1000;
+    protected float m_minStarSize = .15f;
+    protected float m_maxStarSize = .3f;
+
     //Organizational Components
-    GameObject asteroidEmpty;
+    protected GameObject asteroidEmpty;
 
     //To help instantiation of objects work better
-    Grid grid;
+    protected Grid grid;
 
     //Game UI
     public Text gameInfo;
     public Text gameTimer;
 
-    private GameObject gameOverPanel;
-    private Text gameOverText;
-    private Button gameExitButton;
-    private Button gameRestartButton;
+    protected GameObject gameOverPanel;
+    protected Text gameOverText;
+    protected Button gameExitButton;
+    protected Button gameRestartButton;
 
     //Game Settings
     public Vector2 gridWorldSize;
@@ -52,10 +57,33 @@ public class LevelScript : MonoBehaviour {
     public bool debug;
 
     //Game timer
-    float timer;
+    protected float timer;
+
+    //AI
+    public int population = 10;
+
+    protected int numInputs = 12 * 4 + 1;
+    protected int numOutputs = 4;
+    protected int numHiddenLayers = 1;
+    protected int numNodeHiddenLayers = 15;
+
+    internal NeuralNet[] nNetwork;
+    internal GeneticAlgorithm genAlg;
+    internal NeuralNetworkView nView;
+
+    
 
     // Use this for initialization
     void Start () {
+        numNodeHiddenLayers = (numInputs + numOutputs) / 2;
+
+        //-------------Basic Visual Representation of Neural Network---------------------------//
+        nView = GetComponent<NeuralNetworkView>();
+        nView.CreateNetwork(numInputs, numOutputs, numHiddenLayers, numNodeHiddenLayers);
+
+        //Intiation of neural network array for the population
+        nNetwork = new NeuralNet[population];
+
         source = GetComponent<AudioSource>();
 
         if (!debug)
@@ -73,11 +101,34 @@ public class LevelScript : MonoBehaviour {
         {
             Timer();
             gameInfo.text = "Time: " + timer.ToString("0.0");
+
+            //Used to track the best performing spawn
+            double bestFitness = 0;
+            int bestSpawn = 0;
+
+            //TimeScale
+            if (Input.GetKeyDown(KeyCode.Comma))
+            {
+                Time.timeScale *= .5f;
+            }
+            if (Input.GetKeyDown(KeyCode.Period))
+            {
+                Time.timeScale *= 2;
+            }
+            //----------------Use the first spawn as the selected object in visual representation--------------//
+
+            //nView.NodeUpdate(input, nNetwork[0]);
+
+            //More Stats
+            genAlg.CalculateBestWorstAvTot();
+            gameInfo.text += "\nBest Fitness: " + genAlg.bestFitness + "\nAverage Fitness: " + genAlg.averageFitness + "\nLowest Fitness: " + genAlg.worstFitness;
         }
+
+
 
     }
 
-    private void RunGameSetup()
+    protected void RunGameSetup()
     {
         
         //Setup Game UI
@@ -100,26 +151,19 @@ public class LevelScript : MonoBehaviour {
         grid = new GameObject("Grid").AddComponent<Grid>();
         grid.levelScript = this;
 
-        asteroidEmpty = new GameObject("food");
-
         minWorldPosX = grid.grid[0, 0].worldPosition.x;
         minWorldPosY = grid.grid[0, 0].worldPosition.y;
         maxWorldPosX = grid.grid[grid.gridSizeX - 1, grid.gridSizeY - 1].worldPosition.x;
         maxWorldPosY = grid.grid[grid.gridSizeX - 1, grid.gridSizeY - 1].worldPosition.y;
 
+        grid.CreateGrid();
+
+        // spawn Asteroid and Stars and Background
+        AddStars(starCount);
+        AddAsteroids(asteroidCount);
+
         GameObject borderBlock = Instantiate(border, Vector3.zero, Quaternion.identity) as GameObject;
         borderBlock.transform.localScale = new Vector3(gridWorldSize.x, gridWorldSize.y, 1);
-
-        grid.CreateGrid();
-
-        // spawn Food
-
-        for (int i = 0; i < asteroidCount; i++)
-        {
-            AddAsteroid();
-        }
-
-        grid.CreateGrid();
 
         //Add Player
         int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
@@ -131,38 +175,71 @@ public class LevelScript : MonoBehaviour {
         player.name = "player1";
         player.tag = "Player";
 
-        ////Spawn AI
-        //for (int i = 0; i < aiCount; i++) {
-        //	AddAI ();
-        //}
+        //Spawn AI
+        AddAI(aiCount);
+        
 
     }
 
-    //public void AddAI (){
-    //	int index = UnityEngine.Random.Range (0, spawnLocations.Count);
-    //	Coord location = spawnLocations [index];
-    //	GameObject ai = Instantiate (bubble, new Vector3 (location.x, location.y), Quaternion.identity) as GameObject;
-    //	ai.GetComponent<SpriteRenderer> ().color = new Color (UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-    //	ai.transform.localScale = new Vector3(1.8f,1.8f);
-    //	ai.name = "AI";
-    //	ai.tag = "ai";
-    //	//ai.AddComponent<Rigidbody2D> ();
-    //	AI aiScript = ai.AddComponent<AI>();
-    //	//ai.transform.SetParent (foodEmpty.transform);
-    //}
-    private void AddAsteroid()
+    protected void AddAI(int aiCount)
     {
-        int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
-        int asteroidSize = UnityEngine.Random.Range(minAsteroidSize, maxAsteroidSize);
-        float asteroidVel = UnityEngine.Random.Range(minAsteroidVel, maxAsteroidVel);
-        Vector2 velDirection = Random.insideUnitCircle.normalized;
+        GameObject aiEmpty = new GameObject("AIOpponents");
+        for (int i = 0; i < aiCount; i++)
+        {
+            int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
+            Node node = grid.walkableNodes[index];
+            GameObject ai = Instantiate(aiOpponent, node.worldPosition, Quaternion.identity, aiEmpty.transform) as GameObject;
+            ai.GetComponent<SpriteRenderer>().color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+            ai.name = "AI " + i;
 
-        GameObject asteroid = asteroids[UnityEngine.Random.Range(0, asteroids.Length)];
-        Node node = grid.walkableNodes[index];
-        GameObject asteroidObj = Instantiate(asteroid, node.worldPosition, Quaternion.identity) as GameObject;
-        asteroidObj.transform.localScale = new Vector3(asteroidSize, asteroidSize);
-        asteroidObj.GetComponent<Rigidbody2D>().velocity = velDirection * asteroidVel;
-        asteroidObj.transform.SetParent(asteroidEmpty.transform);
+            //-------Create neural network with defined inputs and ouputs for each spawn----------//
+            nNetwork[i] = new NeuralNet(numInputs, numOutputs, numHiddenLayers, numNodeHiddenLayers);
+            
+
+            //-------Creates on Genetic algorithm to handle the whole popluation-----------------//
+            if (i == 0)
+            {
+                genAlg = new GeneticAlgorithm(population, .2, .7, nNetwork[0].GetNumWeights());
+            }
+            //--------Set the random weights generated in genAlg into--------------------------//
+            nNetwork[i].PutWeights(genAlg.population[i].weights);
+            ai.GetComponent<AI>().neuralNet = nNetwork[i];
+        }
+
+    }
+    protected void AddAsteroids(int astroidCount)
+    {
+        asteroidEmpty = new GameObject("Astroids");
+
+        for (int i = 0; i < asteroidCount; i++)
+        {
+            int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
+            int asteroidSize = UnityEngine.Random.Range(minAsteroidSize, maxAsteroidSize);
+            float asteroidVel = UnityEngine.Random.Range(minAsteroidVel, maxAsteroidVel);
+            Vector2 velDirection = Random.insideUnitCircle.normalized;
+
+            GameObject asteroid = asteroids[UnityEngine.Random.Range(0, asteroids.Length)];
+            Node node = grid.walkableNodes[index];
+            GameObject asteroidObj = Instantiate(asteroid, node.worldPosition, Quaternion.identity) as GameObject;
+            asteroidObj.transform.localScale = new Vector3(asteroidSize, asteroidSize);
+            asteroidObj.GetComponent<Rigidbody2D>().velocity = velDirection * asteroidVel;
+            asteroidObj.transform.SetParent(asteroidEmpty.transform);
+        }
+        
+    }
+
+    protected void AddStars(float num)
+    {
+        GameObject starEmpty = new GameObject("Stars");
+        for (int i = 0; i < num; i++)
+        {
+            float starSize = Random.Range(m_minStarSize, m_maxStarSize);
+            int index = UnityEngine.Random.Range(0, grid.walkableNodes.Count);
+            Node node = grid.walkableNodes[index];
+            GameObject star = Instantiate(starInstance, node.worldPosition, Quaternion.identity, starEmpty.transform) as GameObject;
+            star.transform.localScale = new Vector3(starSize, starSize);
+        }
+        
     }
 
     internal void GameOver()
@@ -221,12 +298,12 @@ public class LevelScript : MonoBehaviour {
 
     //}
 
-    private void Timer()
+    protected void Timer()
     {
         timer += Time.deltaTime;
         gameTimer.text = "Health: " + player.GetComponent<Player>().health;
     }
-    private void RestartGame()
+    protected void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

@@ -12,12 +12,12 @@ public class BaseObject : MonoBehaviour {
     protected Animator animator;
     protected AudioSource source;
 
-    private float volLow = .5f;
-    private float volHigh = 1f;
-    private float freqLow = .75f;
-    private float freqHigh = 1.25f;
+    protected float volLow = .5f;
+    protected float volHigh = 1f;
+    protected float freqLow = .75f;
+    protected float freqHigh = 1.25f;
 
-    private float velMod = .1f;
+    protected float velMod = .1f;
 
     // Use this for initialization
     void Awake () {
@@ -58,6 +58,9 @@ public class BaseObject : MonoBehaviour {
         float damage = Mathf.Abs(rigid.velocity.magnitude - finalVel.magnitude);
 
         health -= damage * damage;
+
+        if (CompareTag("AI"))
+            transform.GetComponent<AI>().fitness -= damage * damage;
 
         if (col.transform.tag == "Projectile")
         {

@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class Projectile : MonoBehaviour {
 
     public float damage = 10;
     protected Rigidbody2D rigid;
+    internal GameObject origin;
 
     void Start()
     {
@@ -14,10 +16,16 @@ public class Projectile : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (col.transform.tag == "Player")
+        if (col.transform.CompareTag("Player"))
         {
             col.transform.GetComponent<Player>().health -= 10;
-            //print("Hit " + col.transform.tag);
+            CheckOrigin();
+        }
+        else if (col.transform.CompareTag("AI"))
+        {
+            col.transform.GetComponent<AI>().health -= 10;
+            col.transform.GetComponent<AI>().fitness -= 10;
+            CheckOrigin();
         }
         else if (col.transform.tag == "Asteroid")
         {
@@ -26,7 +34,7 @@ public class Projectile : MonoBehaviour {
 
             float damage = Mathf.Abs(colRigid.velocity.magnitude - finalVel.magnitude);
 
-            col.transform.GetComponent<AsteroidController>().health -= 10 + damage;
+            col.transform.GetComponent<AsteroidController>().health -= 1 + damage;
             //print("Hit Asteroid: " + col.transform.GetComponent<AsteroidController>().health);
         }
         else
@@ -35,5 +43,13 @@ public class Projectile : MonoBehaviour {
         }
 
         Destroy(gameObject);
+    }
+
+    private void CheckOrigin()
+    {
+        if (origin.CompareTag("AI"))
+        {
+            origin.GetComponent<AI>().fitness += 10;
+        }
     }
 }

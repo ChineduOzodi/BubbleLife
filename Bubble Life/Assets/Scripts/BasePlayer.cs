@@ -20,11 +20,6 @@ public class BasePlayer : BaseObject {
     protected float force = 1;
 	protected Text info;
 	protected Vector3 offset;
-
-    private float volLow = .5f;
-    private float volHigh = 1f;
-    private float freqLow = .75f;
-    private float freqHigh = 1.25f;
     
     void Start(){
 
@@ -33,7 +28,7 @@ public class BasePlayer : BaseObject {
             gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         }
 
-		info = transform.GetComponentInChildren<Text> ();
+		info = transform.GetComponentInChildren<Text>();
 
         playerFlame.gameObject.SetActive(false);
 
@@ -47,7 +42,11 @@ public class BasePlayer : BaseObject {
         }
         if (destroy)
         {
-            levelScript.GameOver();
+            //Reset player;
+            //animator.SetBool("isDead", false);
+            destroy = false;
+            if (gameObject.CompareTag("Player"))
+                levelScript.GameOver();
             Dead();
         }
     }
@@ -55,9 +54,10 @@ public class BasePlayer : BaseObject {
         source.pitch = 1f;
         source.PlayOneShot(fireSound, Random.Range(volLow, volHigh));
 
-		GameObject obj = Instantiate (projectile,gunLocation.transform.position,Quaternion.identity) as GameObject;
+		GameObject obj = Instantiate (projectile,gunLocation.transform.position,Quaternion.identity, levelScript.transform) as GameObject;
         obj.transform.rotation = transform.rotation;
         obj.GetComponent<Rigidbody2D>().velocity = rigid.velocity + (Vector2)(gunLocation.transform.up * projectilePower);
+        obj.GetComponent<Projectile>().origin = gameObject;
 	}
 
     protected void Move()
@@ -67,6 +67,6 @@ public class BasePlayer : BaseObject {
 
     protected void Dead()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 }
