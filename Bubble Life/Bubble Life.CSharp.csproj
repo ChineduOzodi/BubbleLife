@@ -294,6 +294,7 @@
     <Compile Include="Assets\Scripts\CustomImageEffect.cs" />
     <Compile Include="Assets\Scripts\DragObject2D.cs" />
     <Compile Include="Assets\Scripts\Grid.cs" />
+    <Compile Include="Assets\Scripts\Helpers\Polar2.cs" />
     <Compile Include="Assets\Scripts\LevelFunctions.cs" />
     <Compile Include="Assets\Scripts\LevelScript.cs" />
     <Compile Include="Assets\Scripts\Loader.cs" />

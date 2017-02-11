@@ -7,10 +7,11 @@ public class Projectile : MonoBehaviour {
     public float damage = 10;
     protected Rigidbody2D rigid;
     internal GameObject origin;
+    internal float lifeTime = 5;
 
     void Start()
     {
-        Destroy(gameObject, 5);
+        Destroy(gameObject, lifeTime);
         rigid = gameObject.GetComponent<Rigidbody2D>();
     }
 

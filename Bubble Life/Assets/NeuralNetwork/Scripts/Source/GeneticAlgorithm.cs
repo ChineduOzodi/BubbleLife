@@ -30,7 +30,7 @@ namespace NeuralNetwork
         /// <summary>
         /// Mutation rate
         /// </summary>
-        public static double mutationRate = .2;
+        public static double mutationRate = .15;
         /// <summary>
         /// Crossover rate
         /// </summary>
@@ -116,7 +116,7 @@ namespace NeuralNetwork
                 float randFloat = Random.Range(0f, 1f);
                 if (randFloat < mutationRate)
                 {
-                    randFloat = Random.Range(-.1f, .1f);
+                    randFloat = Random.Range(-.03f, .03f);
                     //print("mutation");
                     chromo[i] += randFloat;
 

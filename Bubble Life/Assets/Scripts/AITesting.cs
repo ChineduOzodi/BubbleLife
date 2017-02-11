@@ -190,7 +190,7 @@ public class AITesting : LevelScript {
             float asteroidVel = UnityEngine.Random.Range(minAsteroidVel, maxAsteroidVel);
             Vector2 velDirection = Random.insideUnitCircle.normalized;
 
-            GameObject asteroid = asteroids[UnityEngine.Random.Range(0, asteroids.Length)];
+            GameObject asteroid = asteroidInstances[UnityEngine.Random.Range(0, asteroidInstances.Length)];
             Node node = grid.walkableNodes[index];
             GameObject asteroidObj = Instantiate(asteroid, node.worldPosition, Quaternion.identity) as GameObject;
             asteroidObj.transform.localScale = new Vector3(asteroidSize, asteroidSize);

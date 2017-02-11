@@ -9,7 +9,6 @@ public class BaseObject : MonoBehaviour {
 
     protected LevelScript levelScript;
     protected Rigidbody2D rigid;
-    protected Animator animator;
     protected AudioSource source;
 
     protected float volLow = .5f;
@@ -21,7 +20,6 @@ public class BaseObject : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-        animator = GetComponent<Animator>();
         source = GetComponent<AudioSource>();
         levelScript = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelScript>();
         rigid = gameObject.GetComponent<Rigidbody2D>();

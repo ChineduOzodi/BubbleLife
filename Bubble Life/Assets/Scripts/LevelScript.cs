@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Collections.Generic;
 using NeuralNetwork;
 
 public class LevelScript : MonoBehaviour {
@@ -13,7 +14,7 @@ public class LevelScript : MonoBehaviour {
     //Game Setup
     public GameObject border;
     public GameObject starInstance;
-    public GameObject[] asteroids;
+    public GameObject[] asteroidInstances;
     public GameObject aiOpponent;
     public GameObject playerInstance;
 
@@ -26,6 +27,9 @@ public class LevelScript : MonoBehaviour {
     public int maxAsteroidSize = 10;
     public float minAsteroidVel = 0;
     public float maxAsteroidVel = 10;
+
+    internal List<GameObject> asteroids;
+    internal List<BasePlayer> players;
 
     protected int starCount = 1000;
     protected float m_minStarSize = .15f;
@@ -204,6 +208,8 @@ public class LevelScript : MonoBehaviour {
             //--------Set the random weights generated in genAlg into--------------------------//
             nNetwork[i].PutWeights(genAlg.population[i].weights);
             ai.GetComponent<AI>().neuralNet = nNetwork[i];
+
+            players.Add(ai.GetComponent<AI>());
         }
 
     }
@@ -218,7 +224,7 @@ public class LevelScript : MonoBehaviour {
             float asteroidVel = UnityEngine.Random.Range(minAsteroidVel, maxAsteroidVel);
             Vector2 velDirection = Random.insideUnitCircle.normalized;
 
-            GameObject asteroid = asteroids[UnityEngine.Random.Range(0, asteroids.Length)];
+            GameObject asteroid = asteroidInstances[UnityEngine.Random.Range(0, asteroidInstances.Length)];
             Node node = grid.walkableNodes[index];
             GameObject asteroidObj = Instantiate(asteroid, node.worldPosition, Quaternion.identity) as GameObject;
             asteroidObj.transform.localScale = new Vector3(asteroidSize, asteroidSize);
